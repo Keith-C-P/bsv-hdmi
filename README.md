@@ -8,5 +8,5 @@ A bluespec verilog implementation of the HDMI protocol
 4. Use generated bitstream or mcs (in ./build/bitstream and ./build/mcs) to flash onto Nexys Video board
 5. Plug in a monitor through HDMI Out.
 
-> Verilator simulation is also available, use `make help` for more infi
+> Verilator simulation is also available, use `make help` for more information \
 > Feel free to edit the Makefile to your own needs.
