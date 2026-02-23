@@ -1,13 +1,10 @@
-
 package fpga_top;
-
 import HDMI :: *;
 import Vector :: *;
 import RegFile :: *;
 import ClkWiz :: *;
 import TMDS_Serializer :: *;
 import Clocks :: *;
-
 interface Top_IFC;
     (* always_ready, always_enabled *)
     method Bit#(1) hdmi_tx_p0;
@@ -25,46 +22,46 @@ interface Top_IFC;
     method Bit#(1) hdmi_tx_clk_p;
     (* always_ready, always_enabled *)
     method Bit#(1) hdmi_tx_clk_n;
-endinterface
 
+    // (* always_ready, always_enabled *)
+    // method Bit#(1) led0;  // DEBUG LED
+    // (* always_ready, always_enabled *)
+    // method Bit#(1) led1;  // DEBUG LED
+    // (* always_ready, always_enabled *)
+    // method Bit#(1) led2;  // DEBUG LED
+    // (* always_ready, always_enabled *)
+    // method Bit#(1) led3;  // DEBUG LED
+endinterface
 (* synthesize *)
 module mkTop(Top_IFC);
-
     ClkWiz_IFC clkgen <- mkClkWiz;
-
     Clock pixel_clk   = clkgen.clk_out1;
     Clock tmds_clk_5x = clkgen.clk_out2;
-
     HDMI_IFC hdmi <- mkhdmi(clocked_by pixel_clk, reset_by noReset);
-
     TMDS_Serializer_IFC red_ser <- mkTMDS_Serializer(
         pixel_clk,
         tmds_clk_5x,
         1'b0,
         hdmi.tmds_r
     );
-
     TMDS_Serializer_IFC green_ser <- mkTMDS_Serializer(
         pixel_clk,
         tmds_clk_5x,
         1'b0,
         hdmi.tmds_g
     );
-
     TMDS_Serializer_IFC blue_ser <- mkTMDS_Serializer(
         pixel_clk,
         tmds_clk_5x,
         1'b0,
         hdmi.tmds_b
     );
-
     TMDS_Serializer_IFC clk_ser <- mkTMDS_Serializer(
         pixel_clk,
         tmds_clk_5x,
         1'b0,
-        10'b1111100000
+        10'b0000011111
     );
-
     method Bit#(1) hdmi_tx_p0    = red_ser.tmds_p;
     method Bit#(1) hdmi_tx_n0    = red_ser.tmds_n;
     method Bit#(1) hdmi_tx_p1    = green_ser.tmds_p;
@@ -74,7 +71,9 @@ module mkTop(Top_IFC);
     method Bit#(1) hdmi_tx_clk_p = clk_ser.tmds_p;
     method Bit#(1) hdmi_tx_clk_n = clk_ser.tmds_n;
 
+    // method Bit#(1) led0 = red_ser.tmds_p;   // DEBUG LED
+    // method Bit#(1) led1 = green_ser.tmds_p; // DEBUG LED
+    // method Bit#(1) led2 = blue_ser.tmds_p;  // DEBUG LED
+    // method Bit#(1) led3 = clk_ser.tmds_p;   // DEBUG LED
 endmodule
-
 endpackage
-

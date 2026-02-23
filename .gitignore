@@ -4,10 +4,12 @@
 obj_dir/
 build/
 src/ip/*
+!src/ip/
 !src/ip/clk_wiz_0.xci
 .Xil/
 .ip_user_files/
 dump.vcd
 usage_statistics_webtalk.html
 usage_statistics_webtalk.xml
+nexys-video-master.xdc
 Makefile.bak

@@ -2,7 +2,7 @@
 A bluespec verilog implementation of the HDMI protocol
 
 ## Installation:
-1. Download and install `Vivado 2018.3`
+1. Download and install `Vivado 2018.3`, `bluespec-verilog`, `verilator`
 2. Install the board files
 3. `$ make`
 4. Use generated bitstream or mcs (in ./build/bitstream and ./build/mcs) to flash onto Nexys Video board

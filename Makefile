@@ -6,6 +6,7 @@ PART = xc7a200tsbg484-1
 BUILD_DIR = build
 VERILOG_DIR = $(BUILD_DIR)/verilog
 OBJ_DIR = obj_dir
+BLUESIM_DIR = $(BUILD_DIR)/bluesim
 
 # -------- Tools --------
 BSC = bsc
@@ -14,7 +15,7 @@ VIVADO = vivado
 
 # -------- Flags --------
 BSC_FLAGS = -u -verilog
-BSC_SIM_FLAGS = -sim -g mkTB -u
+BSC_SIM_FLAGS = -sim -u
 VERILATOR_FLAGS = --cc --exe --build --trace -Wall -Wno-fatal
 
 # -------- Color codes --------
@@ -30,11 +31,45 @@ RESET := \033[0m
 .DEFAULT_GOAL := help
 MAKEFLAGS += --no-print-directory
 
-# -------- Simulation Targets --------
+# -------- BSV Simulation Targets --------
+.PHONY: bsv-sim bsv-sim-build bsv-sim-clean
+
+bsv-sim-build: $(BLUESIM_DIR)/sim_$(TARGET)
+	@echo "$(GREEN)Bluesim build complete$(RESET)"
+
+$(BLUESIM_DIR)/sim_$(TARGET): $(TARGET).bsv
+	@echo "$(MAGENTA)=== Building $(TARGET) for Bluesim ===$(RESET)"
+	@mkdir -p $(BLUESIM_DIR)
+	@echo "$(BLUE)Compiling with Bluesim...$(RESET)"
+	$(BSC) +RTS -K128M -RTS $(BSC_SIM_FLAGS) \
+		-simdir $(BLUESIM_DIR) \
+		-bdir $(BLUESIM_DIR) \
+		-info-dir $(BLUESIM_DIR) \
+		-g mk$(TARGET) \
+		-p +:src \
+		$(TARGET).bsv
+	@echo "$(BLUE)Linking simulation...$(RESET)"
+	$(BSC) -sim -e mk$(TARGET) \
+		-simdir $(BLUESIM_DIR) \
+		-bdir $(BLUESIM_DIR) \
+		-o $(BLUESIM_DIR)/sim_$(TARGET)
+	@echo "$(GREEN)Bluesim build finished$(RESET)"
+
+bsv-sim: bsv-sim-build
+	@echo "$(MAGENTA)=== Running Bluesim ===$(RESET)"
+	./$(BLUESIM_DIR)/sim_$(TARGET) -V
+	@if [ -f dump.vcd ]; then \
+		echo "$(GREEN)VCD file generated: dump.vcd$(RESET)"; \
+	fi
+
+bsv-sim-clean:
+	rm -rf $(BLUESIM_DIR) dump.vcd
+
+# -------- Verilator Simulation Targets --------
 .PHONY: sim run sim-build sim-clean
 
 sim-build: $(OBJ_DIR)/V$(TARGET)
-	@echo "$(GREEN)Simulation build complete$(RESET)"
+	@echo "$(BLUE)Simulation build complete$(RESET)"
 
 $(OBJ_DIR)/V$(TARGET): $(TARGET).bsv sim_main.cpp
 	@echo "$(MAGENTA)=== Building $(TARGET) for Simulation ===$(RESET)"
@@ -52,9 +87,10 @@ $(OBJ_DIR)/V$(TARGET): $(TARGET).bsv sim_main.cpp
 	$(VERILATOR) $(VERILATOR_FLAGS) \
 		--top-module mk$(TARGET) \
 		-o V$(TARGET) \
+		-y /home/keith/Applications/bsc/lib/Verilog \
 		$(VERILOG_DIR)/mk$(TARGET).v \
 		sim_main.cpp
-	@echo "$(GREEN)Verilator build finished OK$(RESET)"
+	@echo "$(BLUE)Verilator build... $(RESET)$(GREEN)OK$(RESET)"
 
 sim run: sim-build
 	@echo "$(MAGENTA)=== Running simulation ===$(RESET)"
@@ -72,6 +108,8 @@ sim-clean:
 $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)
 	mkdir -p $(VERILOG_DIR)
+	mkdir -p $(BUILD_DIR)/bitstream/
+	mkdir -p $(BUILD_DIR)/mcs/
 
 verilog: $(BUILD_DIR)
 	@echo "$(PURPLE)=== Building Verilog for FPGA ===$(RESET)"
@@ -112,10 +150,10 @@ all: mcs
 
 fpga-clean:
 	@echo "$(RED)=== Cleaning FPGA build files ===$(RESET)"
-	rm -rf $(BUILD_DIR) *.jou *.log *.str .Xil
+	rm -rf $(BUILD_DIR) *.jou *.log *.str .Xil .ip_user_files .cache usage_statistics_webtalk.html usage_statistics_webtalk.xml
 	@echo "$(BLUE)FPGA clean finished...$(RESET) $(GREEN)OK$(RESET)"
 
-clean: fpga-clean sim-clean
+clean: fpga-clean sim-clean bsv-sim-clean
 	@echo "$(RED)=== Full clean complete ===$(RESET)"
 
 # -------- Help --------
@@ -123,10 +161,12 @@ clean: fpga-clean sim-clean
 
 help:
 	@echo "$(CYAN)Simulation targets:$(RESET)"
-	@echo "  make sim TARGET=Foo      Build and simulate Foo.bsv (generates dump.vcd)"
+	@echo "  make bsv-sim TARGET=Foo  Build and run Bluesim (fast, native BSV)"
+	@echo "  make sim TARGET=Foo      Build and simulate with Verilator"
 	@echo "  make run TARGET=Foo      Same as sim"
 	@echo "  make sim-build TARGET=Foo  Only build simulation, don't run"
-	@echo "  make sim-clean           Clean simulation files"
+	@echo "  make sim-clean           Clean Verilator simulation files"
+	@echo "  make bsv-sim-clean       Clean Bluesim files"
 	@echo ""
 	@echo "$(CYAN)FPGA targets:$(RESET)"
 	@echo "  make verilog             Generate Verilog from BSV"

@@ -34,7 +34,7 @@ module mkhdmi(HDMI_IFC);
     TMDS_Encoder_IFC tmdsG <- mkTMDS_Encoder;
     TMDS_Encoder_IFC tmdsB <- mkTMDS_Encoder;
 
-    Reg#(Bit#(8)) r <- mkReg(0);
+    Reg#(Bit#(8)) r <- mkReg(255);
     Reg#(Bit#(8)) g <- mkReg(0);
     Reg#(Bit#(8)) b <- mkReg(0);
     Reg#(UInt#(12)) h_cnt <- mkReg(0);
@@ -60,7 +60,7 @@ module mkhdmi(HDMI_IFC);
         endcase
     endfunction
 
-    Reg#(VideoTiming) timing <- mkReg(timingFor(MODE_720p_60));
+    Reg#(VideoTiming) timing <- mkReg(timingFor(MODE_640x480_60));
     
     // Combine both rules into one to avoid scheduling issues
     rule generate_pixel;
@@ -88,15 +88,12 @@ module mkhdmi(HDMI_IFC);
         end
         // Send data to encoders
         if (active) begin
-            tmdsR.encode(r, True, 2'b0);
-            tmdsG.encode(g, True, 2'b0);
-            tmdsB.encode(b, True, 2'b0);
-            r <= r + 1;
-            g <= g + 2;
-            b <= b + 3;
+            tmdsR.encode(r, True, 2'b00);
+            tmdsG.encode(g, True, 2'b00);
+            tmdsB.encode(b, True, 2'b00);
         end else begin
-            tmdsR.encode(8'b0, False, 2'b1);
-            tmdsG.encode(8'b0, False, 2'b1);
+            tmdsR.encode(8'b0, False, 2'b00);
+            tmdsG.encode(8'b0, False, 2'b00);
             tmdsB.encode(8'b0, False, {pack(vsync), pack(hsync)});
         end
     endrule

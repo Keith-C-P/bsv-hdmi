@@ -1,41 +1,28 @@
-#include "Vmktb_tmds.h"
+#include "VmkHDMI_TB.h"  // Changed from Vmktb_tmds
 #include "verilated.h"
 #include "verilated_vcd_c.h"
 
 int main(int argc, char **argv) {
     Verilated::commandArgs(argc, argv);
     Verilated::traceEverOn(true);
-
-    Vmktb_tmds *top = new Vmktb_tmds;
-
+    
+    VmkHDMI_TB *top = new VmkHDMI_TB;  // Changed
     VerilatedVcdC *tfp = new VerilatedVcdC;
+    
     top->trace(tfp, 99);
     tfp->open("dump.vcd");
-
-    top->RST_N = 0;
-    top->CLK = 0;
+    
+    // No CLK/RST_N - testbench generates its own clocks
     top->eval();
 
-    for (int i = 0; i < 5; i++) {
-        top->CLK = !top->CLK;
+    vluint64_t sim_time = 0;
+    for (sim_time = 0; sim_time < 1000000000 && !Verilated::gotFinish(); sim_time++) {
         top->eval();
+        tfp->dump(sim_time);
     }
-
-    top->RST_N = 1;   // release reset
-
-    for (int i = 0; i < 1000 && !Verilated::gotFinish(); i++) {
-        top->CLK = 0;
-        top->eval();
-        tfp->dump(i * 10);
-
-        top->CLK = 1;
-        top->eval();
-        tfp->dump(i * 10 + 5);
-    }
-
+    
     top->final();
     tfp->close();
     delete top;
     return 0;
 }
-

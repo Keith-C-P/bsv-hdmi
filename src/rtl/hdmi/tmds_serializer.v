@@ -53,6 +53,7 @@ module tmds_serializer (
     );
     
     // SLAVE
+    (* DONT_TOUCH = "TRUE" *)
     OSERDESE2 #(
         .DATA_RATE_OQ("DDR"),
         .DATA_RATE_TQ("BUF"),        // Changed from "SDR" to "BUF"
