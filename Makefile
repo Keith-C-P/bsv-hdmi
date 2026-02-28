@@ -110,6 +110,7 @@ $(BUILD_DIR):
 	mkdir -p $(VERILOG_DIR)
 	mkdir -p $(BUILD_DIR)/bitstream/
 	mkdir -p $(BUILD_DIR)/mcs/
+	mkdir -p $(BUILD_DIR)/ip/
 
 verilog: $(BUILD_DIR)
 	@echo "$(PURPLE)=== Building Verilog for FPGA ===$(RESET)"

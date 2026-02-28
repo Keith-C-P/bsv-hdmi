@@ -22,12 +22,12 @@ module tmds_serializer (
         .OFB(),
         .TQ(),
         .TFB(),
-        .SHIFTOUT1(shift1),
-        .SHIFTOUT2(shift2),
+        .SHIFTOUT1(),
+        .SHIFTOUT2(),
         .TBYTEOUT(),
         
-        .SHIFTIN1(1'b0),
-        .SHIFTIN2(1'b0),
+        .SHIFTIN1(shift1),
+        .SHIFTIN2(shift2),
         
         .CLK(serial_clk),
         .CLKDIV(pixel_clk),
@@ -65,12 +65,12 @@ module tmds_serializer (
         .OFB(),
         .TQ(),
         .TFB(),
-        .SHIFTOUT1(),
-        .SHIFTOUT2(),
+        .SHIFTOUT1(shift1),
+        .SHIFTOUT2(shift2),
         .TBYTEOUT(),
         
-        .SHIFTIN1(shift1),
-        .SHIFTIN2(shift2),
+        .SHIFTIN1(),
+        .SHIFTIN2(),
         
         .CLK(serial_clk),
         .CLKDIV(pixel_clk),
