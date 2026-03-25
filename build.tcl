@@ -21,8 +21,11 @@ read_xdc constraints.xdc
 
 synth_design -top $TOP -part $PART
 
-get_cells -hierarchical *ila*
-get_cells -hierarchical *dbg_hub*
+set clk_net [get_nets -of_objects [get_clocks sys_clk_pin]]
+puts $clk_net
+connect_debug_port dbg_hub/clk $clk_net
+report_clocks
+report_debug_core
 
 opt_design
 place_design
