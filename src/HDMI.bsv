@@ -27,6 +27,11 @@ interface HDMI_IFC;
     method Bit#(10) tmds_r;
     method Bit#(10) tmds_g;
     method Bit#(10) tmds_b;
+
+    method Bit#(1) hsync;
+    method Bit#(1) vsync;
+    method Bit#(1) de;
+
 endinterface
 
 module mkhdmi(HDMI_IFC);
@@ -39,6 +44,9 @@ module mkhdmi(HDMI_IFC);
     Reg#(Bit#(8)) b <- mkReg(0);
     Reg#(UInt#(12)) h_cnt <- mkReg(0);
     Reg#(UInt#(12)) v_cnt <- mkReg(0);
+    Wire#(Bit#(1)) hsync_wire <- mkWire;
+    Wire#(Bit#(1)) vsync_wire <- mkWire;
+    Wire#(Bit#(1)) active_wire <- mkWire;
 
     function VideoTiming timingFor(VideoMode m);
         case (m)
@@ -61,21 +69,21 @@ module mkhdmi(HDMI_IFC);
     endfunction
 
     Reg#(VideoTiming) timing <- mkReg(timingFor(MODE_640x480_60));
-    
+
     // Combine both rules into one to avoid scheduling issues
     rule generate_pixel;
-       // Calculate sync signals and blanking (these are evaluated every cycle)
+        // Calculate sync signals and blanking (these are evaluated every cycle)
         Bool h_active = (h_cnt < unpack(pack(timing.h_active)));
         Bool v_active = (v_cnt < unpack(pack(timing.v_active)));
         Bool active = h_active && v_active;
         UInt#(12) h_sync_start = unpack(pack(timing.h_active)) + unpack(pack(timing.h_fp));
         UInt#(12) h_sync_end = h_sync_start + unpack(pack(timing.h_sync));
-        Bool hsync = (h_cnt >= h_sync_start) && (h_cnt < h_sync_end);
+        Bool _hsync = (h_cnt >= h_sync_start) && (h_cnt < h_sync_end);
         UInt#(12) v_sync_start = unpack(pack(timing.v_active)) + unpack(pack(timing.v_fp));
         UInt#(12) v_sync_end = v_sync_start + unpack(pack(timing.v_sync));
-        Bool vsync = (v_cnt >= v_sync_start) && (v_cnt < v_sync_end);
-       
-       // Update counters
+        Bool _vsync = (v_cnt >= v_sync_start) && (v_cnt < v_sync_end);
+
+        // Update counters
         if (h_cnt == timing.h_total - 1) begin
             h_cnt <= 0;
             if (v_cnt == timing.v_total - 1) begin
@@ -94,12 +102,16 @@ module mkhdmi(HDMI_IFC);
         end else begin
             tmdsR.encode(8'b0, False, 2'b00);
             tmdsG.encode(8'b0, False, 2'b00);
-            tmdsB.encode(8'b0, False, {pack(vsync), pack(hsync)});
+            tmdsB.encode(8'b0, False, {pack(_vsync), pack(_hsync)});
         end
     endrule
+
     method Bit#(10) tmds_r = tmdsR.symbol;
     method Bit#(10) tmds_g = tmdsG.symbol;
     method Bit#(10) tmds_b = tmdsB.symbol;
+    method Bit#(1) hsync = hsync_wire;
+    method Bit#(1) vsync = vsync_wire;
+    method Bit#(1) de = active_wire;
 endmodule
 
 endpackage

@@ -111,6 +111,8 @@ $(BUILD_DIR):
 	mkdir -p $(BUILD_DIR)/bitstream/
 	mkdir -p $(BUILD_DIR)/mcs/
 	mkdir -p $(BUILD_DIR)/ip/
+	mkdir -p $(BUILD_DIR)/debug/
+	touch $(BUILD_DIR)/debug/ila.ltx
 
 verilog: $(BUILD_DIR)
 	@echo "$(PURPLE)=== Building Verilog for FPGA ===$(RESET)"

@@ -29,7 +29,7 @@ module mkTMDS_Serializer
     method tmds_p tmds_p
         clocked_by(no_clock)
         reset_by(no_reset);
-    
+
     method tmds_n tmds_n
         clocked_by(no_clock)
         reset_by(no_reset);
