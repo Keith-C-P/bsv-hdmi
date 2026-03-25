@@ -3,9 +3,10 @@
 *.str
 obj_dir/
 build/
-src/ip/*
-!src/ip/
-!src/ip/clk_wiz_0.xci
+src/ip/clk/*
+!src/ip/clk/clk_wiz_0.xci
+src/ip/ila/*
+!src/ip/ila/ila_0.xci
 .Xil/
 .ip_user_files/
 dump.vcd
