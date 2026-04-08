@@ -1,10 +1,11 @@
 set PART xc7a200tsbg484-1
-set TOP mkTop
+set TOP fpga_top
 
-if {[catch {open_project ./build/my_proj.xpr}]} {
-    create_project my_proj ./build -part xc7a200tsbg484-1
-    set_property BOARD_PART digilentinc.com:nexys_video:part0:1.2 [current_project]
+if {[file exists ./build/my_proj.xpr]} {
+    close_project -quiet
 }
+create_project -force my_proj ./build -part xc7a200tsbg484-1
+set_property BOARD_PART digilentinc.com:nexys_video:part0:1.2 [current_project]
 
 read_ip src/ip/clk/clk_wiz_0.xci
 generate_target all [get_ips clk_wiz_0]

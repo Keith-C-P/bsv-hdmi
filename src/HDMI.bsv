@@ -104,6 +104,10 @@ module mkhdmi(HDMI_IFC);
             tmdsG.encode(8'b0, False, 2'b00);
             tmdsB.encode(8'b0, False, {pack(_vsync), pack(_hsync)});
         end
+
+        hsync_wire <= pack(_hsync);
+        vsync_wire <= pack(_vsync);
+        active_wire <= pack(active);
     endrule
 
     method Bit#(10) tmds_r = tmdsR.symbol;

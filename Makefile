@@ -1,5 +1,5 @@
 # -------- FPGA Configuration --------
-TOP = mkTop
+TOP = mkSocTop
 PART = xc7a200tsbg484-1
 
 # -------- Directories --------
@@ -118,6 +118,7 @@ $(BUILD_DIR):
 verilog: $(BUILD_DIR)
 	@echo "$(PURPLE)=== Building Verilog for FPGA ===$(RESET)"
 	@echo "$(BLUE)Compiling BSV...$(RESET)"
+	@rm -f $(VERILOG_DIR)/*.v
 	bsc -u -verilog -g $(TOP) \
 		-vdir $(VERILOG_DIR) \
 		-bdir $(BUILD_DIR) \
@@ -129,11 +130,12 @@ verilog: $(BUILD_DIR)
 		-verbose \
 		-p +:src:+:$(BLUESPEC_HOME)/lib/Libraries:+:$(BLUESPEC_HOME)/lib/Verilog \
 		+RTS -K100M -RTS \
-		src/fpga_top.bsv
+		src/soc_top.bsv
 	@echo "$(BLUE)BSV Compiled...$(RESET) $(GREEN)OK$(RESET)"
 	@echo "$(BLUE)Copying RTL files...$(RESET)"
 	@cp src/rtl/hdmi/* $(VERILOG_DIR)
 	@cp src/rtl/lib/* $(VERILOG_DIR)
+	@cp src/fpga_top.v $(VERILOG_DIR)
 	@echo "$(BLUE)Files copied...$(RESET) $(GREEN)OK$(RESET)"
 
 bitstream: verilog
