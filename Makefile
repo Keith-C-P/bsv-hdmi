@@ -7,6 +7,7 @@ BUILD_DIR = build
 VERILOG_DIR = $(BUILD_DIR)/verilog
 OBJ_DIR = obj_dir
 BLUESIM_DIR = $(BUILD_DIR)/bluesim
+BLUESPEC_HOME = $(HOME)/Applications/bsc/
 
 # -------- Tools --------
 BSC = bsc
@@ -126,12 +127,13 @@ verilog: $(BUILD_DIR)
 		-show-module-use \
 		-steps 999999999 \
 		-verbose \
-		-p +:src \
+		-p +:src:+:$(BLUESPEC_HOME)/lib/Libraries:+:$(BLUESPEC_HOME)/lib/Verilog \
 		+RTS -K100M -RTS \
 		src/fpga_top.bsv
 	@echo "$(BLUE)BSV Compiled...$(RESET) $(GREEN)OK$(RESET)"
 	@echo "$(BLUE)Copying RTL files...$(RESET)"
 	@cp src/rtl/hdmi/* $(VERILOG_DIR)
+	@cp src/rtl/lib/* $(VERILOG_DIR)
 	@echo "$(BLUE)Files copied...$(RESET) $(GREEN)OK$(RESET)"
 
 bitstream: verilog

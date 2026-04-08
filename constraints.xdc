@@ -8,10 +8,10 @@ create_clock -add -name sys_clk_pin -period 10.00 -waveform {0 5} [get_ports CLK
 set_property -dict { PACKAGE_PIN G4  IOSTANDARD LVCMOS33 } [get_ports { RST_N }];
 
 ## LEDs
-# set_property -dict { PACKAGE_PIN T14   IOSTANDARD LVCMOS25 } [get_ports { led0 }];
-# set_property -dict { PACKAGE_PIN T15   IOSTANDARD LVCMOS25 } [get_ports { led1 }];
-# set_property -dict { PACKAGE_PIN T16   IOSTANDARD LVCMOS25 } [get_ports { led2 }];
-# set_property -dict { PACKAGE_PIN U16   IOSTANDARD LVCMOS25 } [get_ports { led3 }];
+set_property -dict { PACKAGE_PIN T14   IOSTANDARD LVCMOS25 } [get_ports { led0 }];
+set_property -dict { PACKAGE_PIN T15   IOSTANDARD LVCMOS25 } [get_ports { led1 }];
+set_property -dict { PACKAGE_PIN T16   IOSTANDARD LVCMOS25 } [get_ports { led2 }];
+set_property -dict { PACKAGE_PIN U16   IOSTANDARD LVCMOS25 } [get_ports { led3 }];
 
 ## HDMI out
 # set_property -dict { PACKAGE_PIN AA4   IOSTANDARD LVCMOS33 } [get_ports { hdmi_tx_cec }]; #IO_L11N_T1_SRCC_34 Sch=hdmi_tx_cec

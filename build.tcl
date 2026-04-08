@@ -26,6 +26,7 @@ puts $clk_net
 connect_debug_port dbg_hub/clk $clk_net
 report_clocks
 report_debug_core
+report_timing_summary
 
 opt_design
 place_design
